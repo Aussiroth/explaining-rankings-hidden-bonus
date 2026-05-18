@@ -1,0 +1,57 @@
+## Synthetic data generation
+Synthetic data can be generated using the files in the folder synthetic.
+The file `generate_additive.py` constructs instances of g-GBLR, and takes in command line arguments to determine the size of the instance, in the order n, d, k, g. The number of points given an additive bonus is equal to k * n, so k should be a floating point value between 0.0 to 1.0.
+
+As an example, `python generate_additive.py 10000 2 0.5 2` generates an instance of 10000 tuples with 2 dimensional features, with 5000 tuples given an additive bonus, where there are 2 groups of distinct additive bonus.
+
+The file `generate_arbitrary.py` constructs instances of SGBLR, and takes in command line arguments to determine the size of the instance, in the order n, d, k.
+
+As an example, `python generate_arbitrary.py 5000 5 0.1` generates an instance of 5000 tuples with 5 dimensional features, with 500 tuples given an additive bonus.
+
+The output is written to a file in the same directory, with the parameters contained in the filename.
+
+## JEE Data
+The JEE dataset is found in the folder JEE.
+
+The raw data is found in `jee2009.csv`, and the preprocessed data which has removed the unused attributes and candidates with missing attributes in `jee.in`. 
+
+To generate instances of different `n`, run `jeecreate.py` with the desired value of `n` as command line argument. For example, for 50000 tuples, `jeecreate.py 50000`. 
+
+Note that to create instances with only one group, edit the `jeecreate.py` file and set GENDER = True instead of False as it is.
+
+
+## Solver code
+The file `ermb_2d.py` is to solve SGBLR using the ERMB algorithm. Note that it functions only for 2 dimensional input as it exploits specific properties to allow a 1-dimensional search which is faster.
+
+The file `ermb_kd.py` is to solve SGBLR using the ERMB algorithm for arbitrary dimension inputs.
+
+The file `localsearch_group.py` is to solve g-GBLR with the localsearch algorithm.
+
+The file `localsearch_singleton.py` is to solve SGBLR with the localsearch algorithm.
+
+The file `ilp_base.py` is to solve g-GBLR with the ILPbase formulation.
+
+The file `ilp_base_singleton.py` is to solve SGBLR with the ILPbase formulation.
+
+The file `ilp_refined.py` is to solve g-GBLR with the ILPrefined formulation.
+
+The file `ilp_refined_singleton.py` is to solve SGBLR with the ILPrefined formulation.
+
+Python files with the name format `*_functions.py` are intended to be compiled with mypyc for speedup; however the code will still work without this.
+
+## Usage
+
+First, pip install according to the `requirements.txt` file. Note that you will require a Gurobi license (academic or otherwise) set up to be able to run the experiments. 
+
+For all of the solution python files, the input should be given from stdin.
+So for an example with a synthetic data input, run `python ilp_refined.py < synthetic\1group_10000_2_0.1.txt`
+
+If using with other input, the general input format expected is as follows
+The first line should be a line containing `n`, followed by `g` integers representing the size of each group.
+The next `n` lines consist of `d` values separated by a space. The ith line represents the attributes of the ith point.
+
+Finally, `n` more lines follow. Each line should consist of two integers, first the point, then a space, then its rank.
+
+For `onegroup_unknown.py` and `multigroup_unknown.py`, one additional line should follow, with the superset of points that are allowed to be given additive value, separated by spaces.
+
+Using them requires Gurobi for Python to be installed, and with an available license.
